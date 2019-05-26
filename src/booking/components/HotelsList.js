@@ -2,11 +2,13 @@ import React from 'react';
 import { Item } from 'semantic-ui-react';
 import HotelCard from './HotelCard';
 
-const HotelsList = ({ hotels, selectHotel }) => (
+const HotelsList = ({ hotels = [], selectHotel }) => (
   <Item.Group divided>
-    {hotels.map(hotel => (
-      <HotelCard key={hotel.id} hotel={hotel} selectHotel={selectHotel} />
-    ))}
+    {hotels.length === 0
+      ? null
+      : hotels.map(hotel => (
+          <HotelCard key={hotel.id} hotel={hotel} selectHotel={selectHotel} />
+        ))}
   </Item.Group>
 );
 

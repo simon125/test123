@@ -10,34 +10,36 @@ import {
   ZAxis,
 } from 'recharts';
 
-const Example = ({ data }) => (
-  <ResponsiveContainer height={200}>
-    <ScatterChart>
-      <CartesianGrid />
-      <XAxis type="number" dataKey="price" name="cena" unit="zł" />
-      <YAxis
-        domain={[0, 10]}
-        type="number"
-        dataKey="rating"
-        name="ocena gości"
-        unit="/10"
-      />
-      <ZAxis
-        type="number"
-        dataKey="reviews"
-        range={[30, 500]}
-        name="ilość opinii"
-      />
-      <Tooltip
-        content={<CustomTooltip />}
-        cursor={{
-          strokeDasharray: '3 3',
-        }}
-      />
-      <Scatter data={data} fill="#2185d0" />
-    </ScatterChart>
-  </ResponsiveContainer>
-);
+const Example = ({ data }) => {
+  return (
+    <ResponsiveContainer height={200}>
+      <ScatterChart>
+        <CartesianGrid />
+        <XAxis type="number" dataKey="price" name="cena" unit="zł" />
+        <YAxis
+          domain={[0, 10]}
+          type="number"
+          dataKey="rating"
+          name="ocena gości"
+          unit="/10"
+        />
+        <ZAxis
+          type="number"
+          dataKey="reviews"
+          range={[30, 500]}
+          name="ilość opinii"
+        />
+        <Tooltip
+          content={<CustomTooltip />}
+          cursor={{
+            strokeDasharray: '3 3',
+          }}
+        />
+        <Scatter data={data} fill="#2185d0" />
+      </ScatterChart>
+    </ResponsiveContainer>
+  );
+};
 
 export default Example;
 

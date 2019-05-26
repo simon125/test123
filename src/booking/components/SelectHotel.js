@@ -11,20 +11,58 @@ import RatingChart from './RatingChart';
 import { ONLINE_URL, BEDS_TYPE } from '../../utils/const';
 
 const SelectHotel = props => {
+  const [hotels, setHotels] = useState([]);
+  const [isLoading, setLoadingState] = useState(true);
+  const [sortState, setSortState] = useState('reviews');
+  const [filtersState, setFiltersState] = useState({});
+  const [showChart, toggleChartVisibilty] = useState(false);
+
+  useEffect(() => {
+    setLoadingState(true);
+    fetch(ONLINE_URL)
+      .then(response => response.json())
+      .then(data => {
+        setHotels(data.list);
+        setLoadingState(false);
+      });
+  }, []);
+  const filtredHotels = useMemo(() => {
+    console.log('test');
+    return applyFilter(filtersState, hotels);
+  }, [filtersState, hotels]);
+  const hotelsToDisplay = useMemo(() =>
+    filtredHotels.sort(sortHotels[sortState])
+  );
+
+  const handleChnageFilter = (value, checked) => {
+    setFiltersState(prevState => ({ ...prevState, [value]: checked }));
+  };
+  const handleChnageSort = phrase => {
+    setSortState(phrase);
+  };
+  console.log('Fitler state: ', sortState);
   return (
     <Container>
-      <SortBar sortField={'price'} setField={noop} />
+      <SortBar sortField={sortState} setField={handleChnageSort} />
       <Layout>
         <Layout.Sidebar>
-          <ChartSwitcher isChartVisible={false} switchChartVisible={noop} />
-          <Filters count={{}} onChange={noop} />
+          <ChartSwitcher
+            isChartVisible={showChart}
+            switchChartVisible={() => toggleChartVisibilty(!showChart)}
+          />
+          <Filters
+            count={countHotelsByBedType(hotels)}
+            onChange={handleChnageFilter}
+          />
         </Layout.Sidebar>
-        <Layout.Feed isLoading={true}>
-          {false && <RatingChart data={[]} />}
-          {false ? (
+        <Layout.Feed isLoading={isLoading}>
+          {showChart && (
+            <RatingChart data={prepareChartData(hotelsToDisplay)} />
+          )}
+          {isLoading ? (
             <Loader active inline="centered" />
           ) : (
-            <HotelsList hotels={[]} selectHotel={noop} />
+            <HotelsList hotels={hotelsToDisplay} selectHotel={noop} />
           )}
         </Layout.Feed>
       </Layout>
@@ -52,10 +90,10 @@ function applyFilter(filters, data) {
 
 function prepareChartData(hotels) {
   return hotels.map(h => ({
-    rating: h.rating.average,
-    price: h.price.amount,
-    reviews: h.rating.reviews,
-    name: h.title,
+    rating: h.rating.average * 1,
+    price: h.price.amount * 1,
+    reviews: h.rating.reviews * 1,
+    name: h.title * 1,
   }));
 }
 const sortHotels = {
