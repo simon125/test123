@@ -1,4 +1,10 @@
-import React, { useState, useCallback, useEffect, useMemo } from 'react';
+import React, {
+  useState,
+  useCallback,
+  useEffect,
+  useMemo,
+  Suspense,
+} from 'react';
 import axios from 'axios';
 import { Grid, Loader, Container } from 'semantic-ui-react';
 
@@ -6,9 +12,9 @@ import Filters from './Filters';
 import SortBar from './SortBar';
 import HotelsList from './HotelsList';
 import ChartSwitcher from './ChartSwitcher';
-import RatingChart from './RatingChart';
-
 import { ONLINE_URL, BEDS_TYPE } from '../../utils/const';
+
+const RatingChart = React.lazy(() => import('./RatingChart'));
 
 const SelectHotel = props => {
   const [hotels, setHotels] = useState([]);
@@ -33,6 +39,9 @@ const SelectHotel = props => {
   const hotelsToDisplay = useMemo(() =>
     filtredHotels.sort(sortHotels[sortState])
   );
+  const toggleChartCallback = useCallback(() =>
+    toggleChartVisibilty(!showChart)
+  );
 
   const handleChnageFilter = (value, checked) => {
     setFiltersState(prevState => ({ ...prevState, [value]: checked }));
@@ -40,15 +49,16 @@ const SelectHotel = props => {
   const handleChnageSort = phrase => {
     setSortState(phrase);
   };
-  console.log('Fitler state: ', sortState);
+
   return (
     <Container>
+      <h1>TEST</h1>
       <SortBar sortField={sortState} setField={handleChnageSort} />
       <Layout>
         <Layout.Sidebar>
           <ChartSwitcher
             isChartVisible={showChart}
-            switchChartVisible={() => toggleChartVisibilty(!showChart)}
+            switchChartVisible={toggleChartCallback}
           />
           <Filters
             count={countHotelsByBedType(hotels)}
@@ -57,7 +67,9 @@ const SelectHotel = props => {
         </Layout.Sidebar>
         <Layout.Feed isLoading={isLoading}>
           {showChart && (
-            <RatingChart data={prepareChartData(hotelsToDisplay)} />
+            <Suspense fallback={<Loader active inline="centered" />}>
+              <RatingChart data={prepareChartData(hotelsToDisplay)} />
+            </Suspense>
           )}
           {isLoading ? (
             <Loader active inline="centered" />
